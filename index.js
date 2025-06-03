@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const app = express()
 const port = process.env.PORT || 4000;
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config()
 
 
@@ -31,6 +31,7 @@ async function run() {
 
     //data collection
     const jobDataCollection = client.db("careerCode").collection("jobs")
+    const applicationsCollection = client.db('careerCode').collection("applications")
 
 
     // get jobs api from database
@@ -39,6 +40,49 @@ async function run() {
       const result = await cursor.toArray();
       res.send(result)
     })
+
+    //get single data from database
+    app.get('/jobs/:id', async(req, res)=>{
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)}
+      const result = await jobDataCollection.findOne(query);
+      res.send(result)
+    })
+
+
+    //job appplications API's
+
+    app.get('/applications', async(req, res)=>{
+      const email = req.query.email;
+      const query = {
+        applicant: email
+      }
+      const result = await applicationsCollection.find(query).toArray()
+      res.send(result)
+    })
+
+
+    app.post('/applications', async(req, res)=>{
+      const application = req.body;
+      console.log(application)
+      const result = await applicationsCollection.insertOne(application);
+      
+
+      //bad way to aggregate data
+      for(const application of result){
+        const jobId = application.jobId;
+        const jobQuery = {_id: new ObjectId(jobId)}
+        const job = await jobDataCollection.findOne(jobQuery)
+        application.company = job.company
+        application.title = job.title;
+        application.company_logo = job.company_logo
+      }
+      
+      
+      
+      res.send(result);
+    })
+
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
