@@ -35,16 +35,16 @@ async function run() {
 
 
     // get jobs api from database
-    app.get('/jobs', async(req,res)=>{
+    app.get('/jobs', async (req, res) => {
       const cursor = jobDataCollection.find();
       const result = await cursor.toArray();
       res.send(result)
     })
 
     //get single data from database
-    app.get('/jobs/:id', async(req, res)=>{
+    app.get('/jobs/:id', async (req, res) => {
       const id = req.params.id;
-      const query = {_id: new ObjectId(id)}
+      const query = { _id: new ObjectId(id) }
       const result = await jobDataCollection.findOne(query);
       res.send(result)
     })
@@ -52,34 +52,34 @@ async function run() {
 
     //job appplications API's
 
-    app.get('/applications', async(req, res)=>{
+    app.get('/applications', async (req, res) => {
       const email = req.query.email;
       const query = {
         applicant: email
       }
       const result = await applicationsCollection.find(query).toArray()
-      res.send(result)
-    })
 
-
-    app.post('/applications', async(req, res)=>{
-      const application = req.body;
-      console.log(application)
-      const result = await applicationsCollection.insertOne(application);
-      
 
       //bad way to aggregate data
-      for(const application of result){
+      for (const application of result) {
         const jobId = application.jobId;
-        const jobQuery = {_id: new ObjectId(jobId)}
+        const jobQuery = { _id: new ObjectId(jobId) }
         const job = await jobDataCollection.findOne(jobQuery)
+        // console.log(job)
         application.company = job.company
         application.title = job.title;
         application.company_logo = job.company_logo
       }
-      
-      
-      
+
+
+      res.send(result)
+    })
+
+
+    app.post('/applications', async (req, res) => {
+      const application = req.body;
+      // console.log(application)
+      const result = await applicationsCollection.insertOne(application);
       res.send(result);
     })
 
@@ -97,10 +97,10 @@ run().catch(console.dir);
 
 
 // route
-app.get('/', (req, res)=>{
-    res.send("Welcome to career job portal back end server")
+app.get('/', (req, res) => {
+  res.send("Welcome to career job portal back end server")
 })
 
-app.listen(port, ()=>{
-    console.log(`This is my career code job portal backend server${port}`)
+app.listen(port, () => {
+  console.log(`This is my career code job portal backend server${port}`)
 })
