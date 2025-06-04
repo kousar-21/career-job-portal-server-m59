@@ -60,6 +60,7 @@ async function run() {
       const result = await applicationsCollection.find(query).toArray()
 
 
+    
       //bad way to aggregate data
       for (const application of result) {
         const jobId = application.jobId;
