@@ -41,6 +41,12 @@ async function run() {
       res.send(result)
     })
 
+    //could be done for getting single email data's job creation
+    app.get('/jobsByEmailAddress', async(req, res)=>{
+      const email = req.query.email;
+      const query = {hr_email: email}
+    })
+
     //get single data from database
     app.get('/jobs/:id', async (req, res) => {
       const id = req.params.id;
