@@ -49,6 +49,14 @@ async function run() {
       res.send(result)
     })
 
+    //send data form to data base
+    app.post("/jobs", async(req, res)=>{
+      const newJob = req.body;
+      console.log(newJob)
+      const result = await jobDataCollection.insertOne(newJob);
+      res.send(result)
+    })
+
 
     //job appplications API's
 
